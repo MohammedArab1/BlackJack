@@ -50,10 +50,10 @@ class Deck():
 class Player():
 
     #create a player with a name, cards in hand and money.
-    def __init__(self,name):
+    def __init__(self,name,totalMoney):
         self.name = name
         self.cardsInHand = []
-        self.totalMoney = 50
+        self.totalMoney = totalMoney
 
 
     #Asks the player if they want to get another card or if they want to stand.
@@ -93,12 +93,12 @@ class Player():
         for card in self.cardsInHand:
             if card.rank == 'Ace':
                 aceValue = input("Input 1 if you'd like your Ace to be of value 1, 2 if you'd like your ace to be of value 11 ")
-                while not aceValue.isdigit() or (int(aceValue) != 1 or int(aceValue) != 2):
+                while not aceValue.isdigit() and (aceValue != '1' and aceValue != '2'):
                     aceValue = input("Please only input valid integers. Input 1 if you'd like your Ace to be of value 1, 2 if you'd like your ace to be of value 11 ")
-            
-                if int(aceValue) == 1:
+
+                if aceValue == '1':
                     card.value = 1
-                elif int(aceValue) == 2:
+                elif aceValue == '2':
                     card.value = 11
 
     #Counts the total value of all the cards in the player's hand
@@ -108,7 +108,7 @@ class Player():
             total += card.value
         return total
     
-    #Allows to compate the cards in player's hands to dealer
+    #Allows to compare the cards in player's hands to dealer
     def compareWithDealer(self,dealer):
         if self.countTotal() > dealer.countTotal():
             return 'win'
@@ -132,8 +132,8 @@ class Player():
 class Dealer(Player):
 
     #Initiating a Dealer object through the constructor for Player
-    def __init__(self, name):
-        Player.__init__(self, name)
+    def __init__(self, name, totalMoney):
+        Player.__init__(self, name, totalMoney)
         self.numberOfAces = 1
     
     #If dealer has ace, works out whether the ace is of value 1 or 11
@@ -158,8 +158,8 @@ while gameOn:
     print("Welcome to BlackJack!\n")
 
     #Creating a dealer and a player
-    dealer = Dealer("Dealer")
-    player1 = Player(input("Please input the name for Player 1: "))
+    dealer = Dealer("Dealer",100)
+    player1 = Player(input("Please input the name for Player 1: "),50)
 
     #Showing the player how much money he'll be starting with
     print("All players, including the dealer, will start with a total of ${}.\n".format(dealer.totalMoney))
@@ -246,18 +246,20 @@ while gameOn:
                 dealer.dealerIfAce(dealer.cardsInHand[2])  
                 dealer.showCards()
             
+            dealerBusted = False
 
             #If dealer busts, player wins
             if dealer.countTotal() > 21:
                 print("\nThe dealer has busted. You win 2x your bet. You now have {}".format(player1.totalMoney+player1Bet*2))
                 player1.totalMoney += player1Bet*2
                 dealer.totalMoney -= player1Bet
+                dealerBusted = True
 
 
             #If neither player nor dealer busts, start comparing the dealer's hands with the player's hands
 
             #If player has greater hand than dealer, win
-            if player1.compareWithDealer(dealer) == 'win':
+            if player1.compareWithDealer(dealer) == 'win' or dealerBusted == True:
                 print("\nCongratulations! your card total is {} while the dealer's total is {}. You win this round".format(player1.countTotal(), dealer.countTotal()))
                 print("You win 2x your bet. You now have : ${}\n".format(player1.totalMoney + player1Bet*2))
                 player1.totalMoney += player1Bet*2
